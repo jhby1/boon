@@ -29,6 +29,7 @@
 package org.boon.json;
 
 import org.boon.Str;
+import org.boon.core.reflection.ErrorHandler;
 import org.boon.core.reflection.Mapper;
 import org.boon.core.reflection.MapperComplex;
 import org.boon.core.reflection.MapperSimple;
@@ -56,6 +57,7 @@ public class JsonParserFactory {
     private boolean acceptSingleValueAsArray;
 
     private boolean checkDates=true;
+    private ErrorHandler errorHandler;
 
 
     public FieldAccessMode getFieldAccessType() {
@@ -114,12 +116,12 @@ public class JsonParserFactory {
     private Mapper createMapper() {
         if (useAnnotations && !caseInsensitiveFields &&
                          !acceptSingleValueAsArray && ignoreSet == null
-                && Str.isEmpty(view) && respectIgnore) {
+                && Str.isEmpty(view) && respectIgnore && errorHandler == null) {
             return new MapperSimple(fieldAccessType.create(true));
         }
         return new MapperComplex(fieldAccessType, useAnnotations,
                 caseInsensitiveFields, ignoreSet, view,
-                respectIgnore, acceptSingleValueAsArray);
+                respectIgnore, acceptSingleValueAsArray, errorHandler);
     }
 
 
@@ -351,5 +353,9 @@ public class JsonParserFactory {
 
     public boolean isCheckDatesSet() {
         return checkDates;
+    }
+
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 }

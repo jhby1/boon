@@ -70,6 +70,7 @@ public class MapperComplex implements Mapper {
     private final boolean respectIgnore;
     private final boolean acceptSingleValueAsArray;
     private final boolean outputType;
+    private final ErrorHandler errorHandler;
 
 
     public MapperComplex(boolean outputType, FieldAccessMode fieldAccessType, boolean useAnnotations,
@@ -81,17 +82,19 @@ public class MapperComplex implements Mapper {
         this.respectIgnore = respectIgnore;
         this.acceptSingleValueAsArray = acceptSingleValueAsArray;
         this.outputType = outputType;
+        this.errorHandler = null;
     }
 
     public MapperComplex(FieldAccessMode fieldAccessType, boolean useAnnotations,
                          boolean caseInsensitiveFields, Set<String> ignoreSet,
-                         String view, boolean respectIgnore, boolean acceptSingleValueAsArray) {
+                         String view, boolean respectIgnore, boolean acceptSingleValueAsArray, ErrorHandler errorHandler) {
         fieldsAccessor = FieldAccessMode.create( fieldAccessType, useAnnotations, caseInsensitiveFields );
         this.ignoreSet = ignoreSet;
         this.view = view;
         this.respectIgnore = respectIgnore;
         this.acceptSingleValueAsArray = acceptSingleValueAsArray;
         this.outputType = true;
+        this.errorHandler = errorHandler;
     }
     public MapperComplex(FieldsAccessor fieldsAccessor, Set<String> ignoreSet, String view, boolean respectIgnore) {
         this.fieldsAccessor = fieldsAccessor;
@@ -100,6 +103,7 @@ public class MapperComplex implements Mapper {
         this.respectIgnore = respectIgnore;
         this.acceptSingleValueAsArray = false;
         this.outputType = true;
+        this.errorHandler = null;
     }
 
     public MapperComplex(Set<String> ignoreSet, String view, boolean respectIgnore) {
@@ -109,6 +113,7 @@ public class MapperComplex implements Mapper {
         this.respectIgnore = respectIgnore;
         this.acceptSingleValueAsArray = false;
         this.outputType = true;
+        this.errorHandler = null;
     }
 
 
@@ -119,6 +124,7 @@ public class MapperComplex implements Mapper {
         this.respectIgnore = true;
         this.acceptSingleValueAsArray = false;
         this.outputType = true;
+        this.errorHandler = null;
     }
 
     public MapperComplex(boolean acceptSingleValueAsArray) {
@@ -129,7 +135,7 @@ public class MapperComplex implements Mapper {
         respectIgnore = true;
         this.acceptSingleValueAsArray = acceptSingleValueAsArray;
         this.outputType = true;
-
+        this.errorHandler = null;
     }
 
     public MapperComplex() {
@@ -140,6 +146,7 @@ public class MapperComplex implements Mapper {
         respectIgnore = true;
         acceptSingleValueAsArray = false;
         this.outputType = true;
+        this.errorHandler = null;
     }
 
 
@@ -210,6 +217,7 @@ public class MapperComplex implements Mapper {
 
 
             if ( field == null ) {
+                onMissingField(mapEntry, cls);
                 continue;
             }
 
@@ -1230,6 +1238,7 @@ public class MapperComplex implements Mapper {
 
 
                 if ( field == null ) {
+                    onMissingField(entry, cls);
                     continue;
                 }
 
@@ -1262,6 +1271,17 @@ public class MapperComplex implements Mapper {
         }
 
         return newInstance;
+    }
+
+    private void onMissingField(Map.Entry<String, Object> entry, Class<?> cls) {
+        if (errorHandler == null)
+            return;
+
+        Object value = entry.getValue();
+        if ( value instanceof Value ) {
+            value = ((Value) value).toValue();
+        }
+        errorHandler.onMissingField(cls, entry.getKey(), value);
     }
 
     /**
