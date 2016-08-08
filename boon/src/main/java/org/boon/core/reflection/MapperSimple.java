@@ -2,10 +2,7 @@ package org.boon.core.reflection;
 
 import org.boon.Boon;
 import org.boon.Lists;
-import org.boon.core.Conversions;
-import org.boon.core.Typ;
-import org.boon.core.TypeType;
-import org.boon.core.Value;
+import org.boon.core.*;
 import org.boon.core.reflection.fields.FieldAccess;
 import org.boon.core.reflection.fields.FieldAccessMode;
 import org.boon.core.reflection.fields.FieldsAccessor;
@@ -90,7 +87,6 @@ public class MapperSimple implements Mapper {
      */
     @Override
     public  <T> T fromMap(final Map<String, Object> map, final Class<T> cls) {
-
 
         T toObject = Reflection.newInstance( cls );
         Map<String, FieldAccess> fields = fieldsAccessor.getFields( toObject.getClass() );
@@ -1070,6 +1066,10 @@ public class MapperSimple implements Mapper {
     @SuppressWarnings("unchecked")
     public  <T> T fromValueMap(final Map<String, Value> valueMap,
                                final Class<T> cls) {
+
+        final T ifDefined = CustomParsers.parseIfDefined(cls, valueMap);
+        if (ifDefined != null)
+            return ifDefined;
 
         T newInstance = Reflection.newInstance( cls );
         ValueMap map = ( ValueMap ) ( Map ) valueMap;

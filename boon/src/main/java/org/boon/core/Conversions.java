@@ -52,8 +52,6 @@ public class Conversions {
 
     private static final Logger log = Logger.getLogger(Conversions.class.getName());
 
-    final static ConcurrentHashMap<Class<?>, Converter> converters = new ConcurrentHashMap<>();
-
     public static BigDecimal toBigDecimal(Object obj) {
         if (obj instanceof BigDecimal) {
             return (BigDecimal) obj;
@@ -383,9 +381,9 @@ public class Conversions {
         if (value == null) {
             return Reflection.newInstance(clz);
         }
-        if (converters.containsKey(clz)) {
-            return (T) converters.get(clz).parse(clz, value);
-        }
+        final T parsed = CustomParsers.parseIfDefined(clz, value);
+        if (parsed != null)
+            return parsed;
 
         ClassMeta meta = ClassMeta.classMeta(clz);
         List<ConstructorAccess> constructors = meta.oneArgumentConstructors();
@@ -1641,7 +1639,4 @@ public class Conversions {
 
     }
 
-    public static <T> void register(Class<T> type, Converter<T> converter) {
-        converters.put(type, converter);
-    }
 }
