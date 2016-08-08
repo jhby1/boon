@@ -77,3 +77,5 @@ slumberdb/slumberdb-mysql/build/poms/pom-default.xml
 slumberdb/slumberdb-service-model/build/poms/pom-default.xml
 
 build/poms/pom-default.xml
+
+.gradle
