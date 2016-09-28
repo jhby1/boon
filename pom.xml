@@ -16,6 +16,18 @@
 
     <description>Boon Bundle</description>
     <url>http://richardhightower.github.io/site/Boon</url>
+ <distributionManagement>
+        <repository>
+            <id>strategicode-release-repo</id>
+            <name>Strategicode Release Repository</name>
+            <url>s3://maven.strategicode.com/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>strategicode-snapshot-repo</id>
+            <name>Strategicode Snapshot Repository</name>
+            <url>s3://maven.strategicode.com/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <licenses>
         <license>
@@ -179,6 +191,13 @@
     </dependencyManagement>
 
     <build>
+<extensions>
+            <extension>
+                <groupId>org.springframework.build</groupId>
+                <artifactId>aws-maven</artifactId>
+                <version>5.0.0.RELEASE</version>
+            </extension>
+        </extensions>
         <pluginManagement>
             <plugins>
                 <plugin>
