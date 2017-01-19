@@ -838,6 +838,14 @@ public class CharScanner {
                 offset++;
                 negative=true;
             }
+
+            // JH: Detect invalid chars.
+            for (int i=offset; i<to; i++) {
+                char d = digitChars[i];
+                if (d < '0' || d > '9')
+                    throw new RuntimeException("Invalid character '" + d + "' in integer value: " + new String(digitChars, offset, to-offset));
+            }
+
             if (negative) {
             num = (digitChars[ offset ] - '0');
             if ( ++offset < to ) {

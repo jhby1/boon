@@ -1374,4 +1374,9 @@ public class CharScannerTest {
         assertEquals(19, CharScanner.parseInt("19 ".toCharArray()));
         assertEquals(21, CharScanner.parseInt(" 21 ".toCharArray()));
     }
+
+    @Test(expected = RuntimeException.class)
+    public void parseIntWithInvalidChars() {
+        CharScanner.parseInt("17x".toCharArray());
+    }
 }
