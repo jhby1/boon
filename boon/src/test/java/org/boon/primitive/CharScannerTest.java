@@ -1367,4 +1367,11 @@ public class CharScannerTest {
     }
 
 
+
+    @Test
+    public void parseIntSpaces() {
+        assertEquals(17, CharScanner.parseInt(" 17".toCharArray()));
+        assertEquals(19, CharScanner.parseInt("19 ".toCharArray()));
+        assertEquals(21, CharScanner.parseInt(" 21 ".toCharArray()));
+    }
 }

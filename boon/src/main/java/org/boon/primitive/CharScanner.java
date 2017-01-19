@@ -822,6 +822,13 @@ public class CharScanner {
     public static int parseInt(char[] digitChars, int offset, int to) {
 
         try {
+            //JH: Handle spaces
+            while (digitChars[offset] == ' ') {
+                offset++;
+            }
+            while (digitChars[to-1] == ' ') {
+                to--;
+            }
 
 
             int num;
