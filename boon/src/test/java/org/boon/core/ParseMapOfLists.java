@@ -73,7 +73,6 @@ public class ParseMapOfLists {
     }
 
     @Test
-    @Ignore
     public void create_complex() {
         JsonParserFactory jsonParserFactory = new JsonParserFactory();
         jsonParserFactory.lax();

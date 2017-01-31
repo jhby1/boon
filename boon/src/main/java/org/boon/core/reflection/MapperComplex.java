@@ -1377,7 +1377,10 @@ public class MapperComplex implements Mapper {
 
 
                 Class keyType = (Class)field.getParameterizedType().getActualTypeArguments()[0];
-                Class valueType = (Class)field.getParameterizedType().getActualTypeArguments()[1];
+//                Class valueType = (Class)field.getParameterizedType().getActualTypeArguments()[1];
+                final Type type2 = field.getParameterizedType().getActualTypeArguments()[1];
+                Class valueType = MapOfListsHelper.getValueType(type2);
+                Class innerType = MapOfListsHelper.getInnerType(type2);
 
                 Map mapInner = (Map)objValue;
                 Set<Map.Entry> set = mapInner.entrySet();
@@ -1393,7 +1396,11 @@ public class MapperComplex implements Mapper {
                     }
 
                     key  = Conversions.coerce( keyType, key );
-                    evalue = Conversions.coerce( valueType, evalue );
+                    if (valueType == null) {
+                        evalue = convertListOfMapsToObjects((List<Map>) evalue, innerType);
+                    } else {
+                        evalue = Conversions.coerce( valueType, evalue );
+                    }
                     newMap.put( key, evalue );
                 }
 

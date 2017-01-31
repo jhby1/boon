@@ -1238,21 +1238,8 @@ public class MapperSimple implements Mapper {
 
                 Class keyType = (Class)field.getParameterizedType().getActualTypeArguments()[0];
                 final Type type2 = field.getParameterizedType().getActualTypeArguments()[1];
-                Class valueType = null;
-                Class innerType = null;
-                if (type2 instanceof ParameterizedType) {
-                    ParameterizedType t = (ParameterizedType) type2;
-                    Class rawType = (Class) t.getRawType();
-                    if (rawType != java.util.List.class)
-                        throw new RuntimeException("Can only handle lists");
-                    final Type[] typeArguments = t.getActualTypeArguments();
-                    if (typeArguments.length != 1)
-                        throw new RuntimeException("Can only handle one type argument");
-                    innerType = (Class) typeArguments[0];
-
-                } else {
-                    valueType = (Class) type2;
-                }
+                Class valueType = MapOfListsHelper.getValueType(type2);
+                Class innerType = MapOfListsHelper.getInnerType(type2);
 
                 Map mapInner = (Map)objValue;
                 Set<Map.Entry> set = mapInner.entrySet();
