@@ -1,6 +1,9 @@
 package org.boon.core;
 
 import org.boon.Boon;
+import org.boon.core.reflection.ErrorHandler;
+import org.boon.json.JsonParserAndMapper;
+import org.boon.json.JsonParserFactory;
 import org.junit.Test;
 
 import java.util.Map;
@@ -33,25 +36,29 @@ public class CustomConversionTest {
             return new Primitive(val, source);
         }
     }
-
-    @Test
-    public void parse_string_to_item() {
+    public void use_static_parser() {
         CustomParsers.register(Primitive.class, new CustomParser<Primitive>() {
             @Override
             public Primitive parse(Class<Primitive> clz, Object value) {
                 return Primitive.create((String) value, "customParser1");
             }
         });
-
-        final Sample sample = Boon.fromJson("{p: \"x\"}", Sample.class);
-        assertNotNull(sample);
-        assertNotNull(sample.p);
-        assertEquals("x", sample.p.val);
-        assertEquals("customParser1", sample.p.source);
     }
 
-    @Test
-    public void parse_map_to_item() {
+    final JsonParserAndMapper complexMapper;
+    public CustomConversionTest() {
+        JsonParserFactory jsonParserFactory = new JsonParserFactory();
+        jsonParserFactory.lax();
+        jsonParserFactory.setErrorHandler(new ErrorHandler() {
+            @Override
+            public void onMissingField(Class<?> cls, String key, Object value) {
+
+            }
+        });
+        complexMapper = jsonParserFactory.create();
+    }
+
+    public void use_dynamic_parser() {
         CustomParsers.register(Primitive.class, new CustomParser<Primitive>() {
             @Override
             public Primitive parse(Class<Primitive> clz, Object value) {
@@ -63,12 +70,50 @@ public class CustomConversionTest {
             }
         });
 
-        final Sample sample = Boon.fromJson("{p: {\"val\": \"x\"}}", Sample.class);
+    }
+
+    private final String sample1json = "{p: \"x\"}";
+    private final String sample2json = "{p: {\"val\": \"x\"}}";
+
+    @Test
+    public void simple_parse_string_to_item() {
+        use_static_parser();
+
+        final Sample sample = Boon.fromJson(sample1json, Sample.class);
+        checkSample(sample, "customParser1");
+    }
+
+    @Test
+    public void complex_parse_string_to_item() {
+        use_static_parser();
+
+        final Sample sample = complexMapper.parse(Sample.class, sample1json);
+        checkSample(sample, "customParser1");
+    }
+
+    private void checkSample(Sample sample, String source) {
         assertNotNull(sample);
         assertNotNull(sample.p);
         assertEquals("x", sample.p.val);
-        assertEquals("customParser2", sample.p.source);
+        assertEquals(source, sample.p.source);
 
+    }
+
+    @Test
+    public void simple_parse_map_to_item() {
+        use_dynamic_parser();
+
+        final Sample sample = Boon.fromJson(sample2json, Sample.class);
+        checkSample(sample, "customParser2");
+
+    }
+
+    @Test
+    public void complex_parse_map_to_item() {
+        use_dynamic_parser();
+
+        final Sample sample = complexMapper.parse(Sample.class, sample2json);
+        checkSample(sample, "customParser2");
     }
 
 }
