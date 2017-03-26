@@ -1,15 +1,17 @@
 package org.boon.core;
 
+import com.google.common.collect.Lists;
 import org.boon.Boon;
 import org.boon.core.reflection.ErrorHandler;
 import org.boon.json.JsonParserAndMapper;
 import org.boon.json.JsonParserFactory;
 import org.junit.Test;
 
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Jonas Hallerby <jonas@strategicode.com>
@@ -36,6 +38,15 @@ public class CustomConversionTest {
             return new Primitive(val, source);
         }
     }
+
+    public static class ListWrapper<T> {
+        public final Collection<T> list;
+
+        public ListWrapper(Collection<T> list) {
+            this.list = list;
+        }
+    }
+
     public void use_static_parser() {
         CustomParsers.register(Primitive.class, new CustomParser<Primitive>() {
             @Override
@@ -67,6 +78,15 @@ public class CustomConversionTest {
                     return Primitive.create(x.toString(), "customParser2");
                 }
                 throw new RuntimeException("Unexpected input type");
+            }
+        });
+        CustomParsers.register(ListWrapper.class, new CustomParser<ListWrapper>() {
+            @Override
+            public ListWrapper parse(Class<ListWrapper> clz, Object value) {
+                if (value instanceof Collection) {
+                    return new ListWrapper((Collection) value);
+                }
+                throw new RuntimeException("Unsupported type: " + value.getClass());
             }
         });
 
@@ -114,6 +134,22 @@ public class CustomConversionTest {
 
         final Sample sample = complexMapper.parse(Sample.class, sample2json);
         checkSample(sample, "customParser2");
+    }
+
+
+
+    @Test
+    public void parse_empty_list() {
+        use_dynamic_parser();
+        assertEquals(0, complexMapper.parse(ListWrapper.class, "[]").list.size());
+    }
+
+    @Test
+    public void parse_string_list_one_entry() {
+        use_dynamic_parser();
+        ListWrapper p = complexMapper.parse(ListWrapper.class, "['a']");
+        assertEquals(1, p.list.size());
+        assertEquals("a", p.list.iterator().next().toString());
     }
 
 }

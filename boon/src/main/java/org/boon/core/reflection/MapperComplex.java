@@ -316,6 +316,10 @@ public class MapperComplex implements Mapper {
     @Override
     public  <T> T fromList(List<?> argList, Class<T> clazz) {
 
+        final T ifDefined = CustomParsers.parseIfDefined(clazz, argList);
+        if (ifDefined != null)
+            return ifDefined;
+
         /* Size of the arguments. */
         int size = argList.size();
 
