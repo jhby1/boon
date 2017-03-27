@@ -75,17 +75,17 @@ public class JsonMappingParser implements JsonParserAndMapper {
 
     public JsonMappingParser(       Mapper mapper, Charset charset,
                                     boolean lax,
-                                    boolean chop, boolean lazyChop ) {
+                                    boolean chop, boolean lazyChop , boolean checkDates) {
 
 
         this.charset = charset;
         this.mapper = mapper;
 
         if ( lax ) {
-           this.basicParser = new BaseJsonParserAndMapper( new JsonParserLax ( false, chop, lazyChop ), mapper);
-           this.objectParser = new BaseJsonParserAndMapper(new JsonParserLax ( true ), mapper);
+           this.basicParser = new BaseJsonParserAndMapper( new JsonParserLax ( false, chop, lazyChop, checkDates ), mapper);
+           this.objectParser = new BaseJsonParserAndMapper(new JsonParserLax ( true, false, true, checkDates ), mapper);
         } else {
-            this.basicParser = new BaseJsonParserAndMapper( new JsonFastParser ( false, chop, lazyChop ), mapper);
+            this.basicParser = new BaseJsonParserAndMapper( new JsonFastParser ( false, chop, lazyChop, checkDates ), mapper);
             this.objectParser = new BaseJsonParserAndMapper(new JsonFastParser ( true ), mapper);
         }
 

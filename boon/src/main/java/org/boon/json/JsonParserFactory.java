@@ -229,7 +229,7 @@ public class JsonParserFactory {
 
         return new JsonMappingParser (
                 createMapper(), charset,
-                 lax,  chop, lazyChop );
+                 lax,  chop, lazyChop, checkDates );
     }
 
 
