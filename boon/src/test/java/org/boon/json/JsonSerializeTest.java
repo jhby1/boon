@@ -32,6 +32,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.boon.Lists;
 import org.boon.core.reflection.BeanUtils;
+import org.boon.core.reflection.fields.FieldAccess;
+import org.boon.json.serializers.FieldFilter;
 import org.boon.json.serializers.impl.JsonSimpleSerializerImpl;
 import org.boon.json.test.AllTypes;
 import org.boon.json.test.FooEnum;
@@ -42,6 +44,8 @@ import java.util.*;
 
 import static org.boon.Boon.puts;
 import static org.boon.Exceptions.die;
+import static org.junit.Assert.assertEquals;
+
 import org.boon.core.Dates;
 
 /**
@@ -555,4 +559,31 @@ public class JsonSerializeTest {
         serializer.serialize( new int[]{ 0, 1, 2, 3, 4, 5 } );
     }
 
+    public static class BoolWrapper {
+        Boolean b = true;
+        Boolean b2 = null;
+    }
+
+    @Test
+    public void serializeNullableBoolean1() {
+        JsonSerializer serializer = new JsonSerializerFactory().create();
+        String json = serializer.serialize(new BoolWrapper()).toString();
+        assertEquals("{\"b\":true}", json);
+    }
+
+    @Test
+    public void serializeNullableBoolean2() {
+        JsonSerializerFactory factory = new JsonSerializerFactory();
+        factory.setIncludeNulls(true);
+        String json = factory.create().serialize(new BoolWrapper()).toString();
+        assertEquals("{\"b\":true,\"b2\":null}", json);
+    }
+
+    @Test
+    public void serializeNullableBoolean3() {
+        JsonSerializerFactory factory = new JsonSerializerFactory();
+        factory.setIncludeDefault(true);
+        String json = factory.create().serialize(new BoolWrapper()).toString();
+        assertEquals("{\"b\":true}", json);
+    }
 }
