@@ -89,9 +89,7 @@ public class InstanceSerializerImpl implements InstanceSerializer{
             }
 
 
-            if ( index > 0 ) {
-                builder.removeLastChar();
-            }
+            builder.removeLastChar();
 
             builder.addChar( '}' );
 
